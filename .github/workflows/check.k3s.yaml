@@ -33,16 +33,16 @@ jobs:
       run: |
         kubectl get pods -A >> ${{ env.result_file }}
         sed -i '/Running/d' ${{ env.result_file }}
-        echo "::set-output name=pods_status::$(wc -l < ${{ env.result_file }})"
+        echo "no_running_line=$(wc -l < ${{ env.result_file }})" >> $GITHUB_OUTPUT
 
     - name: Additional information in log file
-      if: steps.check_err.outputs.pods_status > 1
+      if: steps.check_err.outputs.no_running_line > 1
       run: |
         sed -i '1 i\Repository: ${{ github.repository }}' ${{ env.result_file }}
         sed -i '2 i\Workflow: ${{ github.workflow }}' ${{ env.result_file }}
 
     - name: Post to a Slack channel
-      if: steps.check_err.outputs.pods_status > 1
+      if: steps.check_err.outputs.no_running_line > 1
       uses: slackapi/slack-github-action@v1.23.0
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}
@@ -67,7 +67,7 @@ jobs:
           }
 
     - name: Upload to slack result file
-      if: steps.check_err.outputs.pods_status > 1
+      if: steps.check_err.outputs.no_running_line > 1
       uses: adrey/slack-file-upload-action@master
       with:
         token: ${{ secrets.SLACK_TOKEN }}
@@ -75,7 +75,7 @@ jobs:
         channel: github_action
 
     - name: Send telegram message
-      if: steps.check_err.outputs.pods_status > 1
+      if: steps.check_err.outputs.no_running_line > 1
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_TO }}
