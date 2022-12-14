@@ -45,16 +45,16 @@ jobs:
         channel-id: 'C04EWNX7BT3'
         payload: |
           {
-            "text": "!!WARNING!! k3s cluster pods statuses are abnormal > text",
+            "text": "Something went wrong..",
             "attachments": [
               {
-                "pretext": "!!WARNING!!",
+                "pretext": "",
                 "color": "ff0000",
                 "fields": [
                   {
-                    "title": "Statuses > Title",
+                    "title": "!!WARNING!!",
                     "short": true,
-                    "value": "Warning > value"
+                    "value": "k3s cluster pods statuses are abnormal!\nSee the ${{ env.result_file }} for details."
                   }
                 ]
               }
@@ -69,15 +69,16 @@ jobs:
         path: ${{ env.result_file }}
         channel: github_action
 
-#    - name: Send telegram message on push
-#      uses: appleboy/telegram-action@master
-#      with:
-#        to: ${{ secrets.TELEGRAM_TO }}
-#        token: ${{ secrets.TELEGRAM_TOKEN }}
-#        message: |
-#          ${{ github.actor }} created commit:
-#          Commit message: ${{ github.event.commits[0].message }}
-#          Repository: ${{ github.repository }}
-#          See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
-#        document: ${{ env.result_file}}
-#
+    - name: Send telegram message
+      if: steps.check_err.outputs.pods_status > 1
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          Warning! Something went wrong..
+          Repository: ${{ github.repository }}
+          Workflow: ${{ github.workflow }}
+          Github Action to Check statuses of pods in k3s cluster in Education Centre say something was wrong.
+          See the ${{ env.result_file }} for details.
+        document: ${{ env.result_file}}
