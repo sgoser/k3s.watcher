@@ -7,6 +7,14 @@ on:
     branches:
       - 'main'
 
+# REQUIREMENTS
+# secrets.SSH_KEY
+# secrets.BASTION_USER
+# secrets.BASTION_ADDR
+# secrets.KUBE_CONFIG
+# secrets.SLACK_TOKEN
+# secrets.TELEGRAM_TOKEN
+
 jobs:
   check:
     env:
